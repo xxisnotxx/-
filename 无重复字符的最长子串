@@ -1,0 +1,61 @@
+#include<string.h>
+int lengthOfLongestSubstring(char * s){
+    int max=0,j=0,i,count=1;
+    for(j=0;j<strlen(s)-1;j++)
+    {
+        for(i=1;j+i<strlen(s);i++)
+        {
+            if(*(s+j)!=*(s+j+i))
+            {
+                count++;
+            }
+        }
+        if(count>max)
+        {
+            max=count;
+        }
+        count=1;
+    }
+    return max;
+}
+该算法本意是将如abcbabb这样的数组进行回溯查找，但该代码只能实现当前字符与第一位的比对；
+重新规划算法，本题算法要求将数组当前位子与前面每一位进行比对，如果都没有相同再加上count；
+而前面每一位的第一位也是从s位子的第一位开始逐渐递加；
+故可以设置第一位为s+j，其中j从0到strlen（s）-2；
+然后前面每一位比对可以用循环，并再加上一个循环变量k，保证s+j+k<s+j+i，也就是k=0；k<i;
+当前位子就使用s+j+i；每过一次比对循环，i加上1，直到出现相同；
+
+int lengthOfLongestSubstring(char * s){
+    int max_size = 0;
+    int cur_size = 0;
+    
+    if(s == NULL)
+        return 0;
+    if(s[0] == '\0')
+        return 0;
+
+    int l = 0; // 用来存放子串最左边的位置
+    int r = 1; // 用来存放子串右边位置，这个值不断右移，移动一次就与前面l位置开始到r-1的位置的值比较。
+    while(s[r] != '\0')
+    {
+        for(int i=l; i<r; ++i)
+        {
+            if(s[r] == s[i]) // 找到相同的值
+            {
+                cur_size = r - l;
+                l = i+1; // 更新l的位置
+
+                if(max_size < cur_size)
+                    max_size = cur_size;
+            }
+        }
+        ++r;
+    }
+
+    cur_size = r-l;
+    if(max_size < cur_size)
+        max_size = cur_size;
+    
+    return max_size;
+}
+在CSDN上找到了这个思路与我一样的代码，但是不理解45行为什么当前大小是r-l，按照我的理解应该是r-i
